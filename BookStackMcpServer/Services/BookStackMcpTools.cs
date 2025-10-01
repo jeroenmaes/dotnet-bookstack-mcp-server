@@ -194,4 +194,165 @@ public class BookStackMcpTools
         var user = await _apiService.GetDetailsAsync<User>(id);
         return JsonSerializer.Serialize(user, new JsonSerializerOptions { WriteIndented = true });
     }
+
+    // Search functionality
+    [Description("Search across all BookStack content (books, chapters, pages)")]
+    [McpServerTool(Name = "search_all")]
+    public async Task<string> SearchAllAsync(string query, int offset = 0, int count = 50)
+    {
+        var results = new
+        {
+            query = query,
+            books = await SearchBooksAsync(query, offset, count),
+            chapters = await SearchChaptersAsync(query, offset, count), 
+            pages = await SearchPagesAsync(query, offset, count)
+        };
+        
+        return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    [Description("Search for books by name or description")]
+    [McpServerTool(Name = "search_books")]
+    public async Task<string> SearchBooksAsync(string query, int offset = 0, int count = 50)
+    {
+        var parameters = new ListParameters { Offset = offset, Count = count };
+        
+        // Create filters for searching in name and description
+        var filters = new List<Filter>
+        {
+            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+        };
+        
+        // Add the filters to the parameters
+        var filtersArray = filters.ToArray();
+        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
+        
+        var response = await _apiService.GetListAsync<Book>(parameters);
+        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    [Description("Search for chapters by name or description")]
+    [McpServerTool(Name = "search_chapters")]
+    public async Task<string> SearchChaptersAsync(string query, int offset = 0, int count = 50)
+    {
+        var parameters = new ListParameters { Offset = offset, Count = count };
+        
+        var filters = new List<Filter>
+        {
+            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+        };
+        
+        var filtersArray = filters.ToArray();
+        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
+        
+        var response = await _apiService.GetListAsync<Chapter>(parameters);
+        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    [Description("Search for pages by name or content")]
+    [McpServerTool(Name = "search_pages")]
+    public async Task<string> SearchPagesAsync(string query, int offset = 0, int count = 50)
+    {
+        var parameters = new ListParameters { Offset = offset, Count = count };
+        
+        var filters = new List<Filter>
+        {
+            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+        };
+        
+        var filtersArray = filters.ToArray();
+        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
+        
+        var response = await _apiService.GetListAsync<Page>(parameters);
+        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    [Description("Search for shelves by name or description")]
+    [McpServerTool(Name = "search_shelves")]
+    public async Task<string> SearchShelvesAsync(string query, int offset = 0, int count = 50)
+    {
+        var parameters = new ListParameters { Offset = offset, Count = count };
+        
+        var filters = new List<Filter>
+        {
+            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+        };
+        
+        var filtersArray = filters.ToArray();
+        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
+        
+        var response = await _apiService.GetListAsync<Shelf>(parameters);
+        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    [Description("Search for users by name or email")]
+    [McpServerTool(Name = "search_users")]
+    public async Task<string> SearchUsersAsync(string query, int offset = 0, int count = 50)
+    {
+        var parameters = new ListParameters { Offset = offset, Count = count };
+        
+        var filters = new List<Filter>
+        {
+            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+        };
+        
+        var filtersArray = filters.ToArray();
+        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
+        
+        var response = await _apiService.GetListAsync<User>(parameters);
+        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    [Description("Advanced search with custom filters")]
+    [McpServerTool(Name = "advanced_search")]
+    public async Task<string> AdvancedSearchAsync(string entityType, string field, string value, string operatorType = "like", int offset = 0, int count = 50)
+    {
+        var parameters = new ListParameters { Offset = offset, Count = count };
+        
+        // Parse the operator
+        if (!Enum.TryParse<FilterOperator>(operatorType, true, out var filterOperator))
+        {
+            filterOperator = FilterOperator.Like;
+        }
+        
+        var filters = new List<Filter>
+        {
+            new Filter { Field = field, Value = value, Operator = filterOperator }
+        };
+        
+        var filtersArray = filters.ToArray();
+        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
+        
+        // Determine entity type and search accordingly
+        switch (entityType.ToLower())
+        {
+            case "book":
+            case "books":
+                var bookResponse = await _apiService.GetListAsync<Book>(parameters);
+                return JsonSerializer.Serialize(bookResponse, new JsonSerializerOptions { WriteIndented = true });
+                
+            case "chapter":
+            case "chapters":
+                var chapterResponse = await _apiService.GetListAsync<Chapter>(parameters);
+                return JsonSerializer.Serialize(chapterResponse, new JsonSerializerOptions { WriteIndented = true });
+                
+            case "page":
+            case "pages":
+                var pageResponse = await _apiService.GetListAsync<Page>(parameters);
+                return JsonSerializer.Serialize(pageResponse, new JsonSerializerOptions { WriteIndented = true });
+                
+            case "shelf":
+            case "shelves":
+                var shelfResponse = await _apiService.GetListAsync<Shelf>(parameters);
+                return JsonSerializer.Serialize(shelfResponse, new JsonSerializerOptions { WriteIndented = true });
+                
+            case "user":
+            case "users":
+                var userResponse = await _apiService.GetListAsync<User>(parameters);
+                return JsonSerializer.Serialize(userResponse, new JsonSerializerOptions { WriteIndented = true });
+                
+            default:
+                return JsonSerializer.Serialize(new { error = $"Unknown entity type: {entityType}. Supported types: book, chapter, page, shelf, user" }, new JsonSerializerOptions { WriteIndented = true });
+        }
+    }
 }

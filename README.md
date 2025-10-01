@@ -34,6 +34,15 @@ This MCP server implements tools for all major BookStack API endpoints:
 - `list_users` - List all users with pagination
 - `get_user` - Get detailed information about a specific user
 
+### Search Functionality
+- `search_all` - Search across all BookStack content (books, chapters, pages)
+- `search_books` - Search for books by name or description
+- `search_chapters` - Search for chapters by name or description  
+- `search_pages` - Search for pages by name or content
+- `search_shelves` - Search for shelves by name or description
+- `search_users` - Search for users by name or email
+- `advanced_search` - Advanced search with custom filters and operators
+
 ## Setup
 
 ### Prerequisites
@@ -140,6 +149,20 @@ Invoke the list_books tool:
 curl -X POST http://localhost:5230/invoke/list_books \
   -H "Content-Type: application/json" \
   -d '{"offset": 0, "count": 10}'
+```
+
+Search for books:
+```bash
+curl -X POST http://localhost:5230/invoke/search_books \
+  -H "Content-Type: application/json" \
+  -d '{"query": "tutorial", "offset": 0, "count": 10}'
+```
+
+Advanced search example:
+```bash
+curl -X POST http://localhost:5230/invoke/advanced_search \
+  -H "Content-Type: application/json" \
+  -d '{"entityType": "page", "field": "name", "value": "guide", "operatorType": "Like"}'
 ```
 
 ## BookStack API Setup
