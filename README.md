@@ -66,6 +66,55 @@ cd BookStackMcpServer
 dotnet run
 ```
 
+### Docker Deployment
+
+The application includes Docker support for easy deployment:
+
+#### Using Docker Compose (Recommended)
+
+1. Copy the environment template:
+```bash
+cp .env.example .env
+```
+
+2. Edit `.env` file with your BookStack configuration:
+```bash
+BOOKSTACK_BASE_URL=https://your-bookstack-instance.com
+BOOKSTACK_TOKEN_ID=your-token-id
+BOOKSTACK_TOKEN_SECRET=your-token-secret
+```
+
+3. Build and run with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+#### Using Docker directly
+
+1. Build the Docker image:
+```bash
+docker build -t bookstack-mcp-server .
+```
+
+2. Run the container:
+```bash
+docker run -d \
+  -p 5230:5230 \
+  -e BookStack__BaseUrl=https://your-bookstack-instance.com \
+  -e BookStack__TokenId=your-token-id \
+  -e BookStack__TokenSecret=your-token-secret \
+  --name bookstack-mcp-server \
+  bookstack-mcp-server
+```
+
+#### GitHub Container Registry
+
+Pre-built images are available from GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/jeroenmaes/dotnet-bookstack-mcp-server:latest
+```
+
 ## API Endpoints (Development)
 
 While the full MCP protocol implementation is in progress, the server provides HTTP endpoints for testing:
