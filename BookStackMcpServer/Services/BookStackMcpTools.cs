@@ -2,6 +2,7 @@ using BookStackApiClient;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 
 namespace BookStackMcpServer.Services;
 
@@ -9,10 +10,12 @@ namespace BookStackMcpServer.Services;
 public class BookStackMcpTools
 {
     private readonly BookStackClient _client;
+    private readonly ILogger<BookStackMcpTools> _logger;
 
-    public BookStackMcpTools(BookStackClient client)
+    public BookStackMcpTools(BookStackClient client, ILogger<BookStackMcpTools> logger)
     {
         _client = client;
+        _logger = logger;
     }
 
     // Books management - simplified version
@@ -20,8 +23,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListBooksAsync(int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Listing books with offset={Offset}, count={Count}", offset, count);
         var listing = new ListingOptions(offset: offset, count: count);
         var response = await _client.ListBooksAsync(listing);
+        _logger.LogDebug("Retrieved {Count} books", response.data.Length);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -29,6 +34,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetBookAsync(int id)
     {
+        _logger.LogInformation("Getting book with ID={BookId}", id);
         var book = await _client.ReadBookAsync(id);
         return JsonSerializer.Serialize(book, new JsonSerializerOptions { WriteIndented = true });
     }
@@ -37,8 +43,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> CreateBookAsync(string name, string? description = null)
     {
+        _logger.LogInformation("Creating book with name='{BookName}'", name);
         var args = new CreateBookArgs(name, description);
         var result = await _client.CreateBookAsync(args);
+        _logger.LogInformation("Book created successfully with ID={BookId}", result.id);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -46,7 +54,9 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> DeleteBookAsync(int id)
     {
+        _logger.LogInformation("Deleting book with ID={BookId}", id);
         await _client.DeleteBookAsync(id);
+        _logger.LogInformation("Book deleted successfully with ID={BookId}", id);
         return JsonSerializer.Serialize(new { success = true }, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -178,6 +188,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> SearchAllAsync(string query, int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Searching all content with query='{Query}', offset={Offset}, count={Count}", query, offset, count);
         var page = offset / count + 1;
         var args = new SearchArgs(query, count, page);
         var response = await _client.SearchAsync(args);
@@ -192,6 +203,7 @@ public class BookStackMcpTools
             shelves = response.shelves().ToList()
         };
         
+        _logger.LogDebug("Search returned {Total} total results", response.total);
         return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 

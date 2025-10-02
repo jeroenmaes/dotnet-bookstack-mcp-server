@@ -11,6 +11,11 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure logging to ensure console output
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 // Add configuration
 builder.Services.Configure<BookStackOptions>(
     builder.Configuration.GetSection(BookStackOptions.SectionName));
@@ -41,6 +46,30 @@ builder.Services.AddHealthChecks()
     .AddCheck<BookStackHealthCheck>("bookstack", tags: new[] { "ready" });
 
 var app = builder.Build();
+
+// Log startup configuration
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+logger.LogInformation("BookStack MCP Server starting...");
+
+var bookStackOptions = app.Configuration.GetSection(BookStackOptions.SectionName).Get<BookStackOptions>();
+if (bookStackOptions != null)
+{
+    logger.LogInformation("BookStack API configured: {BaseUrl}", bookStackOptions.BaseUrl);
+}
+else
+{
+    logger.LogWarning("BookStack API configuration not found");
+}
+
+var securityOptions = app.Configuration.GetSection(SecurityOptions.SectionName).Get<SecurityOptions>();
+if (!string.IsNullOrEmpty(securityOptions?.AuthHeaderName))
+{
+    logger.LogInformation("Security enabled with header: {HeaderName}", securityOptions.AuthHeaderName);
+}
+else
+{
+    logger.LogInformation("Security not configured - all requests allowed");
+}
 
 // Apply security middleware to MCP endpoints
 app.UseWhen(
