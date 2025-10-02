@@ -20,14 +20,14 @@ public class BookStackHealthCheck : IHealthCheck
     {
         try
         {
-            // Call the BookStack status API endpoint
-            // The status endpoint is at /api/status and doesn't require authentication
+            // Call the BookStack status endpoint
+            // The status endpoint is at /status and doesn't require authentication
             var httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromSeconds(5)
             };
             
-            var statusUrl = $"{_baseUrl}/api/status";
+            var statusUrl = $"{_baseUrl}/status";
             
             var response = await httpClient.GetAsync(statusUrl, cancellationToken);
             
