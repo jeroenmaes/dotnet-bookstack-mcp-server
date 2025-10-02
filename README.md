@@ -153,7 +153,7 @@ Security__AuthHeaderValue=your-secret-token
 **Docker example:**
 ```bash
 docker run -d \
-  -p 5230:5230 \
+  -p 8080:8080 \
   -e BookStack__BaseUrl=https://your-bookstack-instance.com \
   -e BookStack__TokenId=your-token-id \
   -e BookStack__TokenSecret=your-token-secret \
