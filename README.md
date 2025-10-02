@@ -175,6 +175,58 @@ docker run -d \
 - Health check endpoints (`/health`, `/health/live`, `/health/ready`) are not protected by this security mechanism
 - When enabled, clients must send the configured header with every MCP request
 
+### HTTP Throttling
+
+The server includes built-in HTTP rate limiting to protect against abuse and excessive requests. Rate limiting is applied per IP address using a fixed window algorithm.
+
+**Configuration:**
+
+In `appsettings.json`:
+```json
+{
+  "Throttling": {
+    "Enabled": true,
+    "PermitLimit": 100,
+    "WindowSeconds": 60,
+    "QueueLimit": 0
+  }
+}
+```
+
+Or via environment variables:
+```bash
+Throttling__Enabled=true
+Throttling__PermitLimit=100
+Throttling__WindowSeconds=60
+Throttling__QueueLimit=0
+```
+
+**Docker example:**
+```bash
+docker run -d \
+  -p 8080:8080 \
+  -e BookStack__BaseUrl=https://your-bookstack-instance.com \
+  -e BookStack__TokenId=your-token-id \
+  -e BookStack__TokenSecret=your-token-secret \
+  -e Throttling__Enabled=true \
+  -e Throttling__PermitLimit=100 \
+  -e Throttling__WindowSeconds=60 \
+  --name bookstack-mcp-server \
+  bookstack-mcp-server
+```
+
+**Configuration Options:**
+- `Enabled` - Enable or disable rate limiting (default: `true`)
+- `PermitLimit` - Maximum number of requests allowed per time window (default: `100`)
+- `WindowSeconds` - Time window in seconds for rate limiting (default: `60`)
+- `QueueLimit` - Number of requests to queue when limit is reached (default: `0` - no queuing)
+
+**Notes:**
+- Rate limiting is applied per IP address
+- Health check endpoints (`/health`, `/health/live`, `/health/ready`) are not rate limited
+- When the limit is exceeded, the server returns a `429 Too Many Requests` response
+- Set `Enabled` to `false` to disable throttling entirely
+
 ### Health Check Endpoints
 
 The server provides ASP.NET Core health check endpoints for monitoring:
@@ -217,6 +269,7 @@ curl http://localhost:8080/health
 - [x] Health checks with BookStack API dependency check
 - [x] MCP protocol implementation using official C# SDK
 - [x] Optional authentication with HTTP headers
+- [x] HTTP throttling/rate limiting
 - [ ] Error handling improvements
 - [ ] Unit tests
 
