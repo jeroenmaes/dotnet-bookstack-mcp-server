@@ -26,6 +26,9 @@ builder.Services.Configure<SecurityOptions>(
 builder.Services.Configure<ThrottlingOptions>(
     builder.Configuration.GetSection(ThrottlingOptions.SectionName));
 
+// Add HttpClient factory for health checks and other HTTP requests
+builder.Services.AddHttpClient();
+
 // Add BookStack API client
 builder.Services.AddSingleton<BookStackClient>(serviceProvider =>
 {
@@ -101,6 +104,9 @@ else
 {
     logger.LogInformation("Security not configured - all requests allowed");
 }
+
+// Add global exception handling middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
  // Apply rate limiting to MCP endpoints (exclude health checks)
 if (throttlingOptions.Enabled)
