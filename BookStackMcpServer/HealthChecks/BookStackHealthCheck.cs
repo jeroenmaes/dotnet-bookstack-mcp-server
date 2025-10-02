@@ -1,16 +1,18 @@
 using BookStackApi;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Options;
+using BookStackMcpServer.Models;
 
 namespace BookStackMcpServer.HealthChecks;
 
 public class BookStackHealthCheck : IHealthCheck
 {
-    private readonly ApiService _apiService;
+    private readonly string _baseUrl;
     private readonly ILogger<BookStackHealthCheck> _logger;
 
-    public BookStackHealthCheck(ApiService apiService, ILogger<BookStackHealthCheck> logger)
+    public BookStackHealthCheck(IOptions<BookStackOptions> options, ILogger<BookStackHealthCheck> logger)
     {
-        _apiService = apiService;
+        _baseUrl = options.Value.BaseUrl.TrimEnd('/');
         _logger = logger;
     }
 
@@ -20,16 +22,19 @@ public class BookStackHealthCheck : IHealthCheck
         {
             // Call the BookStack status API endpoint
             // The status endpoint is at /api/status and doesn't require authentication
-            var httpClient = new HttpClient();
-            var baseUrl = GetBaseUrl();
-            var statusUrl = $"{baseUrl}/api/status";
+            var httpClient = new HttpClient
+            {
+                Timeout = TimeSpan.FromSeconds(5)
+            };
+            
+            var statusUrl = $"{_baseUrl}/api/status";
             
             var response = await httpClient.GetAsync(statusUrl, cancellationToken);
             
             if (response.IsSuccessStatusCode)
             {
                 var content = await response.Content.ReadAsStringAsync(cancellationToken);
-                _logger.LogInformation("BookStack status check succeeded: {Content}", content);
+                _logger.LogInformation("BookStack status check succeeded");
                 
                 return HealthCheckResult.Healthy("BookStack API is responding", new Dictionary<string, object>
                 {
@@ -66,21 +71,5 @@ public class BookStackHealthCheck : IHealthCheck
                 { "error", ex.Message }
             });
         }
-    }
-
-    private string GetBaseUrl()
-    {
-        // Use reflection to get the base URL from the ApiService
-        var field = typeof(ApiService).GetField("_baseUrl", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        if (field != null)
-        {
-            var baseUrl = field.GetValue(_apiService) as string;
-            if (!string.IsNullOrEmpty(baseUrl))
-            {
-                return baseUrl.TrimEnd('/');
-            }
-        }
-        
-        throw new InvalidOperationException("Unable to retrieve base URL from ApiService");
     }
 }
