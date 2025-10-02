@@ -1,6 +1,6 @@
 # BookStack MCP Server
 
-An ASP.NET Core 8 Model Context Protocol (MCP) server that provides tools for interacting with BookStack wiki software via its API.
+An ASP.NET Core 9 Model Context Protocol (MCP) server that provides tools for interacting with BookStack wiki software via its API.
 
 ## Features
 
@@ -46,7 +46,7 @@ This MCP server implements tools for all major BookStack API endpoints:
 ## Setup
 
 ### Prerequisites
-- .NET 8 SDK
+- .NET 9 SDK
 - BookStack instance with API access enabled
 - BookStack API token credentials
 
@@ -255,14 +255,14 @@ curl http://localhost:8080/health
 
 ## Dependencies
 
-- **ASP.NET Core 8** - Web framework
+- **ASP.NET Core 9** - Web framework
 - **ModelContextProtocol.AspNetCore** (0.4.0-preview.1) - MCP server implementation
 - **BookStackApiClient** (25.7.0-lib.2) - BookStack API client library
 - **Microsoft.Extensions.Diagnostics.HealthChecks** (9.0.9) - Health checks support
 
 ## Development Status
 
-- [x] ASP.NET Core 8 project structure
+- [x] ASP.NET Core 9 project structure
 - [x] BookStack API integration
 - [x] MCP tool definitions for all major BookStack entities
 - [x] HTTP endpoints for testing
