@@ -65,8 +65,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListChaptersAsync(int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Listing chapters with offset={Offset}, count={Count}", offset, count);
         var listing = new ListingOptions(offset: offset, count: count);
         var response = await _client.ListChaptersAsync(listing);
+        _logger.LogDebug("Retrieved {Count} chapters", response.data.Length);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -74,6 +76,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetChapterAsync(int id)
     {
+        _logger.LogInformation("Getting chapter with ID={ChapterId}", id);
         var chapter = await _client.ReadChapterAsync(id);
         return JsonSerializer.Serialize(chapter, new JsonSerializerOptions { WriteIndented = true });
     }
@@ -82,8 +85,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> CreateChapterAsync(string name, int bookId, string? description = null, int priority = 0)
     {
+        _logger.LogInformation("Creating chapter with name='{ChapterName}', bookId={BookId}", name, bookId);
         var args = new CreateChapterArgs(bookId, name, description, priority: priority);
         var result = await _client.CreateChapterAsync(args);
+        _logger.LogInformation("Chapter created successfully with ID={ChapterId}", result.id);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -91,7 +96,9 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> DeleteChapterAsync(int id)
     {
+        _logger.LogInformation("Deleting chapter with ID={ChapterId}", id);
         await _client.DeleteChapterAsync(id);
+        _logger.LogInformation("Chapter deleted successfully with ID={ChapterId}", id);
         return JsonSerializer.Serialize(new { success = true }, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -100,8 +107,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListPagesAsync(int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Listing pages with offset={Offset}, count={Count}", offset, count);
         var listing = new ListingOptions(offset: offset, count: count);
         var response = await _client.ListPagesAsync(listing);
+        _logger.LogDebug("Retrieved {Count} pages", response.data.Length);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -109,6 +118,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetPageAsync(int id)
     {
+        _logger.LogInformation("Getting page with ID={PageId}", id);
         var page = await _client.ReadPageAsync(id);
         return JsonSerializer.Serialize(page, new JsonSerializerOptions { WriteIndented = true });
     }
@@ -117,8 +127,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> CreatePageAsync(string name, string content, int? bookId = null, int? chapterId = null)
     {
+        _logger.LogInformation("Creating page with name='{PageName}', bookId={BookId}, chapterId={ChapterId}", name, bookId, chapterId);
         var args = new CreatePageArgs(name, bookId, chapterId, html: content);
         var result = await _client.CreatePageAsync(args);
+        _logger.LogInformation("Page created successfully with ID={PageId}", result.id);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -126,7 +138,9 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> DeletePageAsync(int id)
     {
+        _logger.LogInformation("Deleting page with ID={PageId}", id);
         await _client.DeletePageAsync(id);
+        _logger.LogInformation("Page deleted successfully with ID={PageId}", id);
         return JsonSerializer.Serialize(new { success = true }, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -135,8 +149,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListShelvesAsync(int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Listing shelves with offset={Offset}, count={Count}", offset, count);
         var listing = new ListingOptions(offset: offset, count: count);
         var response = await _client.ListShelvesAsync(listing);
+        _logger.LogDebug("Retrieved {Count} shelves", response.data.Length);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -144,6 +160,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetShelfAsync(int id)
     {
+        _logger.LogInformation("Getting shelf with ID={ShelfId}", id);
         var shelf = await _client.ReadShelfAsync(id);
         return JsonSerializer.Serialize(shelf, new JsonSerializerOptions { WriteIndented = true });
     }
@@ -152,8 +169,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> CreateShelfAsync(string name, string? description = null)
     {
+        _logger.LogInformation("Creating shelf with name='{ShelfName}'", name);
         var args = new CreateShelfArgs(name, description);
         var result = await _client.CreateShelfAsync(args);
+        _logger.LogInformation("Shelf created successfully with ID={ShelfId}", result.id);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -161,7 +180,9 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> DeleteShelfAsync(int id)
     {
+        _logger.LogInformation("Deleting shelf with ID={ShelfId}", id);
         await _client.DeleteShelfAsync(id);
+        _logger.LogInformation("Shelf deleted successfully with ID={ShelfId}", id);
         return JsonSerializer.Serialize(new { success = true }, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -170,8 +191,10 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListUsersAsync(int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Listing users with offset={Offset}, count={Count}", offset, count);
         var listing = new ListingOptions(offset: offset, count: count);
         var response = await _client.ListUsersAsync(listing);
+        _logger.LogDebug("Retrieved {Count} users", response.data.Length);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -179,6 +202,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetUserAsync(int id)
     {
+        _logger.LogInformation("Getting user with ID={UserId}", id);
         var user = await _client.ReadUserAsync(id);
         return JsonSerializer.Serialize(user, new JsonSerializerOptions { WriteIndented = true });
     }
@@ -211,6 +235,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> SearchBooksAsync(string query, int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Searching books with query='{Query}', offset={Offset}, count={Count}", query, offset, count);
         var page = offset / count + 1;
         var args = new SearchArgs(query, count, page);
         var response = await _client.SearchAsync(args);
@@ -222,6 +247,7 @@ public class BookStackMcpTools
             data = response.books().ToList()
         };
         
+        _logger.LogDebug("Books search returned {Total} results", results.total);
         return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -229,6 +255,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> SearchChaptersAsync(string query, int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Searching chapters with query='{Query}', offset={Offset}, count={Count}", query, offset, count);
         var page = offset / count + 1;
         var args = new SearchArgs(query, count, page);
         var response = await _client.SearchAsync(args);
@@ -240,6 +267,7 @@ public class BookStackMcpTools
             data = response.chapters().ToList()
         };
         
+        _logger.LogDebug("Chapters search returned {Total} results", results.total);
         return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -247,6 +275,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> SearchPagesAsync(string query, int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Searching pages with query='{Query}', offset={Offset}, count={Count}", query, offset, count);
         var page = offset / count + 1;
         var args = new SearchArgs(query, count, page);
         var response = await _client.SearchAsync(args);
@@ -258,6 +287,7 @@ public class BookStackMcpTools
             data = response.pages().ToList()
         };
         
+        _logger.LogDebug("Pages search returned {Total} results", results.total);
         return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -265,6 +295,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> SearchShelvesAsync(string query, int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Searching shelves with query='{Query}', offset={Offset}, count={Count}", query, offset, count);
         var page = offset / count + 1;
         var args = new SearchArgs(query, count, page);
         var response = await _client.SearchAsync(args);
@@ -276,6 +307,7 @@ public class BookStackMcpTools
             data = response.shelves().ToList()
         };
         
+        _logger.LogDebug("Shelves search returned {Total} results", results.total);
         return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -283,9 +315,11 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> SearchUsersAsync(string query, int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Searching users with query='{Query}', offset={Offset}, count={Count}", query, offset, count);
         // Note: The new API's search doesn't include users, so we use list with filters
         var listing = new ListingOptions(offset: offset, count: count, filters: new[] { new Filter("name:like", $"%{query}%") });
         var response = await _client.ListUsersAsync(listing);
+        _logger.LogDebug("Users search returned {Count} results", response.data.Length);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -293,6 +327,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> AdvancedSearchAsync(string entityType, string field, string value, string operatorType = "like", int offset = 0, int count = 50)
     {
+        _logger.LogInformation("Advanced search for entityType='{EntityType}', field='{Field}', value='{Value}', operator='{Operator}'", entityType, field, value, operatorType);
         var filter = new Filter($"{field}:{operatorType}", value);
         var listing = new ListingOptions(offset: offset, count: count, filters: new[] { filter });
         
@@ -302,29 +337,35 @@ public class BookStackMcpTools
             case "book":
             case "books":
                 var bookResponse = await _client.ListBooksAsync(listing);
+                _logger.LogDebug("Advanced search returned {Count} books", bookResponse.data.Length);
                 return JsonSerializer.Serialize(bookResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             case "chapter":
             case "chapters":
                 var chapterResponse = await _client.ListChaptersAsync(listing);
+                _logger.LogDebug("Advanced search returned {Count} chapters", chapterResponse.data.Length);
                 return JsonSerializer.Serialize(chapterResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             case "page":
             case "pages":
                 var pageResponse = await _client.ListPagesAsync(listing);
+                _logger.LogDebug("Advanced search returned {Count} pages", pageResponse.data.Length);
                 return JsonSerializer.Serialize(pageResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             case "shelf":
             case "shelves":
                 var shelfResponse = await _client.ListShelvesAsync(listing);
+                _logger.LogDebug("Advanced search returned {Count} shelves", shelfResponse.data.Length);
                 return JsonSerializer.Serialize(shelfResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             case "user":
             case "users":
                 var userResponse = await _client.ListUsersAsync(listing);
+                _logger.LogDebug("Advanced search returned {Count} users", userResponse.data.Length);
                 return JsonSerializer.Serialize(userResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             default:
+                _logger.LogWarning("Unknown entity type requested: {EntityType}", entityType);
                 return JsonSerializer.Serialize(new { error = $"Unknown entity type: {entityType}. Supported types: book, chapter, page, shelf, user" }, new JsonSerializerOptions { WriteIndented = true });
         }
     }
