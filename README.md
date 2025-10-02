@@ -128,7 +128,25 @@ docker pull ghcr.io/jeroenmaes/dotnet-bookstack-mcp-server:latest
 
 The server implements the Model Context Protocol using the official C# SDK. It exposes an MCP endpoint that can be used by MCP-compatible clients to interact with BookStack.
 
-The server uses HTTP transport for MCP communication and automatically exposes all BookStack tools through the MCP protocol.
+### Health Check Endpoints
+
+The server provides ASP.NET Core health check endpoints for monitoring:
+
+- `GET /health` - Comprehensive health check with detailed status information
+- `GET /health/ready` - Readiness check (includes BookStack API dependency check)
+- `GET /health/live` - Liveness check (returns 200 if the application is running)
+
+Check application health:
+```bash
+# Liveness check (app is running)
+curl http://localhost:5230/health/live
+
+# Readiness check (app is ready to serve requests, including BookStack API)
+curl http://localhost:5230/health/ready
+
+# Detailed health information
+curl http://localhost:5230/health
+```
 
 ## BookStack API Setup
 
@@ -141,14 +159,16 @@ The server uses HTTP transport for MCP communication and automatically exposes a
 - **ASP.NET Core 8** - Web framework
 - **ModelContextProtocol.AspNetCore** (0.4.0-preview.1) - MCP server implementation
 - **BookStackApi** (1.3.0) - BookStack API client library
+- **Microsoft.Extensions.Diagnostics.HealthChecks** (9.0.9) - Health checks support
 
 ## Development Status
 
 - [x] ASP.NET Core 8 project structure
 - [x] BookStack API integration
 - [x] MCP tool definitions for all major BookStack entities
+- [x] HTTP endpoints for testing
+- [x] Health checks with BookStack API dependency check
 - [x] MCP protocol implementation using official C# SDK
-- [x] HTTP transport for MCP communication
 - [ ] Authentication and authorization
 - [ ] Error handling improvements
 - [ ] Unit tests
