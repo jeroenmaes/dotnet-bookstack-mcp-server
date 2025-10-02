@@ -128,6 +128,46 @@ docker pull ghcr.io/jeroenmaes/dotnet-bookstack-mcp-server:latest
 
 The server implements the Model Context Protocol using the official C# SDK. It exposes an MCP endpoint that can be used by MCP-compatible clients to interact with BookStack.
 
+### Optional Security
+
+The server supports optional HTTP header-based authentication for the MCP endpoints. When configured, all requests to the MCP endpoint must include the specified authentication header with the correct value.
+
+**Configuration:**
+
+In `appsettings.json`:
+```json
+{
+  "Security": {
+    "AuthHeaderName": "X-MCP-Auth",
+    "AuthHeaderValue": "your-secret-token"
+  }
+}
+```
+
+Or via environment variables:
+```bash
+Security__AuthHeaderName=X-MCP-Auth
+Security__AuthHeaderValue=your-secret-token
+```
+
+**Docker example:**
+```bash
+docker run -d \
+  -p 5230:5230 \
+  -e BookStack__BaseUrl=https://your-bookstack-instance.com \
+  -e BookStack__TokenId=your-token-id \
+  -e BookStack__TokenSecret=your-token-secret \
+  -e Security__AuthHeaderName=X-MCP-Auth \
+  -e Security__AuthHeaderValue=your-secret-token \
+  --name bookstack-mcp-server \
+  bookstack-mcp-server
+```
+
+**Notes:**
+- If `AuthHeaderName` or `AuthHeaderValue` is not configured, security is disabled and all requests are allowed
+- Health check endpoints (`/health`, `/health/live`, `/health/ready`) are not protected by this security mechanism
+- When enabled, clients must send the configured header with every MCP request
+
 ### Health Check Endpoints
 
 The server provides ASP.NET Core health check endpoints for monitoring:
@@ -169,7 +209,7 @@ curl http://localhost:5230/health
 - [x] HTTP endpoints for testing
 - [x] Health checks with BookStack API dependency check
 - [x] MCP protocol implementation using official C# SDK
-- [ ] Authentication and authorization
+- [x] Optional authentication with HTTP headers
 - [ ] Error handling improvements
 - [ ] Unit tests
 

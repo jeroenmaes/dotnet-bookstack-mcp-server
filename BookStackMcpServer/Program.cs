@@ -1,6 +1,7 @@
 using BookStackMcpServer.Models;
 using BookStackMcpServer.Services;
 using BookStackMcpServer.HealthChecks;
+using BookStackMcpServer.Middleware;
 using BookStackApiClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add configuration
 builder.Services.Configure<BookStackOptions>(
     builder.Configuration.GetSection(BookStackOptions.SectionName));
+builder.Services.Configure<SecurityOptions>(
+    builder.Configuration.GetSection(SecurityOptions.SectionName));
 
 // Add BookStack API client
 builder.Services.AddSingleton<BookStackClient>(serviceProvider =>
@@ -38,6 +41,12 @@ builder.Services.AddHealthChecks()
     .AddCheck<BookStackHealthCheck>("bookstack", tags: new[] { "ready" });
 
 var app = builder.Build();
+
+// Apply security middleware to MCP endpoints
+app.UseWhen(
+    context => !context.Request.Path.StartsWithSegments("/health"),
+    appBuilder => appBuilder.UseMiddleware<McpSecurityMiddleware>()
+);
 
 // Map MCP endpoint using the SDK
 app.MapMcp();
