@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using ModelContextProtocol.Server;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Text.Json;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,8 @@ builder.Services.Configure<BookStackOptions>(
     builder.Configuration.GetSection(BookStackOptions.SectionName));
 builder.Services.Configure<SecurityOptions>(
     builder.Configuration.GetSection(SecurityOptions.SectionName));
+builder.Services.Configure<ThrottlingOptions>(
+    builder.Configuration.GetSection(ThrottlingOptions.SectionName));
 
 // Add BookStack API client
 builder.Services.AddSingleton<BookStackClient>(serviceProvider =>
@@ -40,7 +44,43 @@ builder.Services.AddMcpServer()
 builder.Services.AddHealthChecks()
     .AddCheck<BookStackHealthCheck>("bookstack", tags: new[] { "ready" });
 
+// Configure rate limiting
+var throttlingOptions = builder.Configuration.GetSection(ThrottlingOptions.SectionName).Get<ThrottlingOptions>()
+    ?? new ThrottlingOptions();
+
+if (throttlingOptions.Enabled)
+{
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey: httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                factory: partition => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = throttlingOptions.PermitLimit,
+                    Window = TimeSpan.FromSeconds(throttlingOptions.WindowSeconds),
+                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                    QueueLimit = throttlingOptions.QueueLimit
+                }));
+
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+            await context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", cancellationToken);
+        };
+    });
+}
+
 var app = builder.Build();
+
+// Apply rate limiting to MCP endpoints (exclude health checks)
+if (throttlingOptions.Enabled)
+{
+    app.UseWhen(
+        context => !context.Request.Path.StartsWithSegments("/health"),
+        appBuilder => appBuilder.UseRateLimiter()
+    );
+}
 
 // Apply security middleware to MCP endpoints
 app.UseWhen(
