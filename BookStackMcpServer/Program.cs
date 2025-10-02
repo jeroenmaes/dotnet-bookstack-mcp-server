@@ -1,10 +1,13 @@
 using BookStackMcpServer.Models;
 using BookStackMcpServer.Services;
+using BookStackMcpServer.HealthChecks;
 using BookStackApi;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using ModelContextProtocol.Server;
 using System.Reflection;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,10 @@ builder.Services.AddSingleton<ApiService>(serviceProvider =>
 
 // Add MCP tools
 builder.Services.AddSingleton<BookStackMcpTools>();
+
+// Add health checks
+builder.Services.AddHealthChecks()
+    .AddCheck<BookStackHealthCheck>("bookstack", tags: new[] { "ready" });
 
 var app = builder.Build();
 
@@ -124,6 +131,62 @@ app.MapPost("/invoke/{toolName}", async (BookStackMcpTools tools, string toolNam
     catch (Exception ex)
     {
         return Results.Problem($"Error invoking tool: {ex.Message}");
+    }
+});
+
+// Health check endpoints
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description,
+                data = e.Value.Data
+            }),
+            totalDuration = report.TotalDuration
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description
+            })
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false, // No checks, just returns 200 if app is running
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = JsonSerializer.Serialize(new
+        {
+            status = "Healthy"
+        });
+        await context.Response.WriteAsync(result);
     }
 });
 
