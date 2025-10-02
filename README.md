@@ -108,7 +108,7 @@ docker build -t bookstack-mcp-server .
 2. Run the container:
 ```bash
 docker run -d \
-  -p 5230:5230 \
+  -p 8080:8080 \
   -e BookStack__BaseUrl=https://your-bookstack-instance.com \
   -e BookStack__TokenId=your-token-id \
   -e BookStack__TokenSecret=your-token-secret \
@@ -179,13 +179,13 @@ The server provides ASP.NET Core health check endpoints for monitoring:
 Check application health:
 ```bash
 # Liveness check (app is running)
-curl http://localhost:5230/health/live
+curl http://localhost:8080/health/live
 
 # Readiness check (app is ready to serve requests, including BookStack API)
-curl http://localhost:5230/health/ready
+curl http://localhost:8080/health/ready
 
 # Detailed health information
-curl http://localhost:5230/health
+curl http://localhost:8080/health
 ```
 
 ## BookStack API Setup
