@@ -21,6 +21,6 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 
 # Set environment variables for ASP.NET Core
-ENV ASPNETCORE_URLS=http://+:5230
+#ENV ASPNETCORE_URLS=http://+:5230
 
 ENTRYPOINT ["dotnet", "BookStackMcpServer.dll"]
