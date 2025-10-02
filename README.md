@@ -121,7 +121,14 @@ docker run -d \
 Pre-built images are available from GitHub Container Registry:
 
 ```bash
+# Pull the latest image
 docker pull ghcr.io/jeroenmaes/dotnet-bookstack-mcp-server:latest
+
+# Pull a specific build number
+docker pull ghcr.io/jeroenmaes/dotnet-bookstack-mcp-server:build-123
+
+# Pull a specific version tag
+docker pull ghcr.io/jeroenmaes/dotnet-bookstack-mcp-server:v1.0.0
 ```
 
 ## MCP Protocol
