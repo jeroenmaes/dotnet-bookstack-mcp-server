@@ -1,7 +1,7 @@
 using BookStackMcpServer.Models;
 using BookStackMcpServer.Services;
 using BookStackMcpServer.HealthChecks;
-using BookStackApi;
+using BookStackApiClient;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using ModelContextProtocol.Server;
@@ -15,13 +15,17 @@ builder.Services.Configure<BookStackOptions>(
     builder.Configuration.GetSection(BookStackOptions.SectionName));
 
 // Add BookStack API client
-builder.Services.AddSingleton<ApiService>(serviceProvider =>
+builder.Services.AddSingleton<BookStackClient>(serviceProvider =>
 {
     var configuration = serviceProvider.GetRequiredService<IConfiguration>();
     var bookStackOptions = configuration.GetSection(BookStackOptions.SectionName).Get<BookStackOptions>()
         ?? throw new InvalidOperationException("BookStack configuration is required");
     
-    return new ApiService(bookStackOptions.BaseUrl, bookStackOptions.TokenId, bookStackOptions.TokenSecret);
+    // The new API requires a Uri that ends with /api/
+    var baseUrl = bookStackOptions.BaseUrl.TrimEnd('/');
+    var apiUri = new Uri($"{baseUrl}/api/");
+    
+    return new BookStackClient(apiUri, bookStackOptions.TokenId, bookStackOptions.TokenSecret);
 });
 
 // Add MCP Server with HTTP transport and BookStack tools

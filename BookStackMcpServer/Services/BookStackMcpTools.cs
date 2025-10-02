@@ -1,4 +1,4 @@
-using BookStackApi;
+using BookStackApiClient;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
@@ -8,11 +8,11 @@ namespace BookStackMcpServer.Services;
 [McpServerToolType]
 public class BookStackMcpTools
 {
-    private readonly ApiService _apiService;
+    private readonly BookStackClient _client;
 
-    public BookStackMcpTools(ApiService apiService)
+    public BookStackMcpTools(BookStackClient client)
     {
-        _apiService = apiService;
+        _client = client;
     }
 
     // Books management - simplified version
@@ -20,8 +20,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListBooksAsync(int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
-        var response = await _apiService.GetListAsync<Book>(parameters);
+        var listing = new ListingOptions(offset: offset, count: count);
+        var response = await _client.ListBooksAsync(listing);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -29,7 +29,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetBookAsync(int id)
     {
-        var book = await _apiService.GetDetailsAsync<BookDetails>(id);
+        var book = await _client.ReadBookAsync(id);
         return JsonSerializer.Serialize(book, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -37,13 +37,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> CreateBookAsync(string name, string? description = null)
     {
-        var book = new Book
-        {
-            Name = name,
-            Description = description ?? string.Empty
-        };
-        
-        var result = await _apiService.PostAsync(book);
+        var args = new CreateBookArgs(name, description);
+        var result = await _client.CreateBookAsync(args);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -51,8 +46,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> DeleteBookAsync(int id)
     {
-        var result = await _apiService.DeleteAsync<Book>(id);
-        return JsonSerializer.Serialize(new { success = result }, new JsonSerializerOptions { WriteIndented = true });
+        await _client.DeleteBookAsync(id);
+        return JsonSerializer.Serialize(new { success = true }, new JsonSerializerOptions { WriteIndented = true });
     }
 
     // Chapters management - simplified version
@@ -60,8 +55,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListChaptersAsync(int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
-        var response = await _apiService.GetListAsync<Chapter>(parameters);
+        var listing = new ListingOptions(offset: offset, count: count);
+        var response = await _client.ListChaptersAsync(listing);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -69,7 +64,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetChapterAsync(int id)
     {
-        var chapter = await _apiService.GetDetailsAsync<ChapterDetails>(id);
+        var chapter = await _client.ReadChapterAsync(id);
         return JsonSerializer.Serialize(chapter, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -77,15 +72,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> CreateChapterAsync(string name, int bookId, string? description = null, int priority = 0)
     {
-        var chapter = new Chapter
-        {
-            Name = name,
-            BookId = bookId,
-            Description = description ?? string.Empty,
-            Priority = priority
-        };
-        
-        var result = await _apiService.PostAsync(chapter);
+        var args = new CreateChapterArgs(bookId, name, description, priority: priority);
+        var result = await _client.CreateChapterAsync(args);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -93,8 +81,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> DeleteChapterAsync(int id)
     {
-        var result = await _apiService.DeleteAsync<Chapter>(id);
-        return JsonSerializer.Serialize(new { success = result }, new JsonSerializerOptions { WriteIndented = true });
+        await _client.DeleteChapterAsync(id);
+        return JsonSerializer.Serialize(new { success = true }, new JsonSerializerOptions { WriteIndented = true });
     }
 
     // Pages management - simplified version
@@ -102,8 +90,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListPagesAsync(int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
-        var response = await _apiService.GetListAsync<Page>(parameters);
+        var listing = new ListingOptions(offset: offset, count: count);
+        var response = await _client.ListPagesAsync(listing);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -111,7 +99,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetPageAsync(int id)
     {
-        var page = await _apiService.GetDetailsAsync<PageDetails>(id);
+        var page = await _client.ReadPageAsync(id);
         return JsonSerializer.Serialize(page, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -119,14 +107,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> CreatePageAsync(string name, string content, int? bookId = null, int? chapterId = null)
     {
-        var page = new Page
-        {
-            Name = name,
-            BookId = bookId ?? 0,
-            ChapterId = chapterId ?? 0
-        };
-        
-        var result = await _apiService.PostAsync(page);
+        var args = new CreatePageArgs(name, bookId, chapterId, html: content);
+        var result = await _client.CreatePageAsync(args);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -134,8 +116,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> DeletePageAsync(int id)
     {
-        var result = await _apiService.DeleteAsync<Page>(id);
-        return JsonSerializer.Serialize(new { success = result }, new JsonSerializerOptions { WriteIndented = true });
+        await _client.DeletePageAsync(id);
+        return JsonSerializer.Serialize(new { success = true }, new JsonSerializerOptions { WriteIndented = true });
     }
 
     // Shelves management - simplified version
@@ -143,8 +125,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListShelvesAsync(int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
-        var response = await _apiService.GetListAsync<Shelf>(parameters);
+        var listing = new ListingOptions(offset: offset, count: count);
+        var response = await _client.ListShelvesAsync(listing);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -152,7 +134,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetShelfAsync(int id)
     {
-        var shelf = await _apiService.GetDetailsAsync<ShelfDetails>(id);
+        var shelf = await _client.ReadShelfAsync(id);
         return JsonSerializer.Serialize(shelf, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -160,13 +142,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> CreateShelfAsync(string name, string? description = null)
     {
-        var shelf = new Shelf
-        {
-            Name = name,
-            Description = description ?? string.Empty
-        };
-        
-        var result = await _apiService.PostAsync(shelf);
+        var args = new CreateShelfArgs(name, description);
+        var result = await _client.CreateShelfAsync(args);
         return JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -174,8 +151,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> DeleteShelfAsync(int id)
     {
-        var result = await _apiService.DeleteAsync<Shelf>(id);
-        return JsonSerializer.Serialize(new { success = result }, new JsonSerializerOptions { WriteIndented = true });
+        await _client.DeleteShelfAsync(id);
+        return JsonSerializer.Serialize(new { success = true }, new JsonSerializerOptions { WriteIndented = true });
     }
 
     // Users management - simplified version
@@ -183,8 +160,8 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> ListUsersAsync(int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
-        var response = await _apiService.GetListAsync<User>(parameters);
+        var listing = new ListingOptions(offset: offset, count: count);
+        var response = await _client.ListUsersAsync(listing);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
     
@@ -192,7 +169,7 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> GetUserAsync(int id)
     {
-        var user = await _apiService.GetDetailsAsync<User>(id);
+        var user = await _client.ReadUserAsync(id);
         return JsonSerializer.Serialize(user, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -201,12 +178,18 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> SearchAllAsync(string query, int offset = 0, int count = 50)
     {
+        var page = offset / count + 1;
+        var args = new SearchArgs(query, count, page);
+        var response = await _client.SearchAsync(args);
+        
         var results = new
         {
             query = query,
-            books = await SearchBooksAsync(query, offset, count),
-            chapters = await SearchChaptersAsync(query, offset, count), 
-            pages = await SearchPagesAsync(query, offset, count)
+            total = response.total,
+            books = response.books().ToList(),
+            chapters = response.chapters().ToList(),
+            pages = response.pages().ToList(),
+            shelves = response.shelves().ToList()
         };
         
         return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
@@ -216,91 +199,81 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> SearchBooksAsync(string query, int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
+        var page = offset / count + 1;
+        var args = new SearchArgs(query, count, page);
+        var response = await _client.SearchAsync(args);
         
-        // Create filters for searching in name and description
-        var filters = new List<Filter>
+        var results = new
         {
-            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+            query = query,
+            total = response.books().Count(),
+            data = response.books().ToList()
         };
         
-        // Add the filters to the parameters
-        var filtersArray = filters.ToArray();
-        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
-        
-        var response = await _apiService.GetListAsync<Book>(parameters);
-        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+        return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 
     [Description("Search for chapters by name or description")]
     [McpServerTool]
     public async Task<string> SearchChaptersAsync(string query, int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
+        var page = offset / count + 1;
+        var args = new SearchArgs(query, count, page);
+        var response = await _client.SearchAsync(args);
         
-        var filters = new List<Filter>
+        var results = new
         {
-            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+            query = query,
+            total = response.chapters().Count(),
+            data = response.chapters().ToList()
         };
         
-        var filtersArray = filters.ToArray();
-        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
-        
-        var response = await _apiService.GetListAsync<Chapter>(parameters);
-        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+        return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 
     [Description("Search for pages by name or content")]
     [McpServerTool]
     public async Task<string> SearchPagesAsync(string query, int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
+        var page = offset / count + 1;
+        var args = new SearchArgs(query, count, page);
+        var response = await _client.SearchAsync(args);
         
-        var filters = new List<Filter>
+        var results = new
         {
-            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+            query = query,
+            total = response.pages().Count(),
+            data = response.pages().ToList()
         };
         
-        var filtersArray = filters.ToArray();
-        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
-        
-        var response = await _apiService.GetListAsync<Page>(parameters);
-        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+        return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 
     [Description("Search for shelves by name or description")]
     [McpServerTool]
     public async Task<string> SearchShelvesAsync(string query, int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
+        var page = offset / count + 1;
+        var args = new SearchArgs(query, count, page);
+        var response = await _client.SearchAsync(args);
         
-        var filters = new List<Filter>
+        var results = new
         {
-            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
+            query = query,
+            total = response.shelves().Count(),
+            data = response.shelves().ToList()
         };
         
-        var filtersArray = filters.ToArray();
-        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
-        
-        var response = await _apiService.GetListAsync<Shelf>(parameters);
-        return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
+        return JsonSerializer.Serialize(results, new JsonSerializerOptions { WriteIndented = true });
     }
 
     [Description("Search for users by name or email")]
     [McpServerTool]
     public async Task<string> SearchUsersAsync(string query, int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
-        
-        var filters = new List<Filter>
-        {
-            new Filter { Field = "name", Value = query, Operator = FilterOperator.Like }
-        };
-        
-        var filtersArray = filters.ToArray();
-        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
-        
-        var response = await _apiService.GetListAsync<User>(parameters);
+        // Note: The new API's search doesn't include users, so we use list with filters
+        var listing = new ListingOptions(offset: offset, count: count, filters: new[] { new Filter("name:like", $"%{query}%") });
+        var response = await _client.ListUsersAsync(listing);
         return JsonSerializer.Serialize(response, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -308,48 +281,35 @@ public class BookStackMcpTools
     [McpServerTool]
     public async Task<string> AdvancedSearchAsync(string entityType, string field, string value, string operatorType = "like", int offset = 0, int count = 50)
     {
-        var parameters = new ListParameters { Offset = offset, Count = count };
-        
-        // Parse the operator
-        if (!Enum.TryParse<FilterOperator>(operatorType, true, out var filterOperator))
-        {
-            filterOperator = FilterOperator.Like;
-        }
-        
-        var filters = new List<Filter>
-        {
-            new Filter { Field = field, Value = value, Operator = filterOperator }
-        };
-        
-        var filtersArray = filters.ToArray();
-        typeof(ListParameters).GetProperty("Filters")?.SetValue(parameters, filtersArray);
+        var filter = new Filter($"{field}:{operatorType}", value);
+        var listing = new ListingOptions(offset: offset, count: count, filters: new[] { filter });
         
         // Determine entity type and search accordingly
         switch (entityType.ToLower())
         {
             case "book":
             case "books":
-                var bookResponse = await _apiService.GetListAsync<Book>(parameters);
+                var bookResponse = await _client.ListBooksAsync(listing);
                 return JsonSerializer.Serialize(bookResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             case "chapter":
             case "chapters":
-                var chapterResponse = await _apiService.GetListAsync<Chapter>(parameters);
+                var chapterResponse = await _client.ListChaptersAsync(listing);
                 return JsonSerializer.Serialize(chapterResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             case "page":
             case "pages":
-                var pageResponse = await _apiService.GetListAsync<Page>(parameters);
+                var pageResponse = await _client.ListPagesAsync(listing);
                 return JsonSerializer.Serialize(pageResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             case "shelf":
             case "shelves":
-                var shelfResponse = await _apiService.GetListAsync<Shelf>(parameters);
+                var shelfResponse = await _client.ListShelvesAsync(listing);
                 return JsonSerializer.Serialize(shelfResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             case "user":
             case "users":
-                var userResponse = await _apiService.GetListAsync<User>(parameters);
+                var userResponse = await _client.ListUsersAsync(listing);
                 return JsonSerializer.Serialize(userResponse, new JsonSerializerOptions { WriteIndented = true });
                 
             default:

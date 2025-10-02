@@ -158,7 +158,7 @@ curl http://localhost:5230/health
 
 - **ASP.NET Core 8** - Web framework
 - **ModelContextProtocol.AspNetCore** (0.4.0-preview.1) - MCP server implementation
-- **BookStackApi** (1.3.0) - BookStack API client library
+- **BookStackApiClient** (25.7.0-lib.2) - BookStack API client library
 - **Microsoft.Extensions.Diagnostics.HealthChecks** (9.0.9) - Health checks support
 
 ## Development Status
