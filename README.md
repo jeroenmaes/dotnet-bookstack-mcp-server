@@ -124,13 +124,9 @@ Pre-built images are available from GitHub Container Registry:
 docker pull ghcr.io/jeroenmaes/dotnet-bookstack-mcp-server:latest
 ```
 
-## API Endpoints (Development)
+## MCP Protocol
 
-While the full MCP protocol implementation is in progress, the server provides HTTP endpoints for testing:
-
-- `GET /tools` - List all available MCP tools with their parameters
-- `GET /test` - Test BookStack API connectivity
-- `POST /invoke/{toolName}` - Invoke a specific tool with parameters
+The server implements the Model Context Protocol using the official C# SDK. It exposes an MCP endpoint that can be used by MCP-compatible clients to interact with BookStack.
 
 ### Health Check Endpoints
 
@@ -139,39 +135,6 @@ The server provides ASP.NET Core health check endpoints for monitoring:
 - `GET /health` - Comprehensive health check with detailed status information
 - `GET /health/ready` - Readiness check (includes BookStack API dependency check)
 - `GET /health/live` - Liveness check (returns 200 if the application is running)
-
-### Example Usage
-
-List available tools:
-```bash
-curl http://localhost:5230/tools
-```
-
-Test BookStack connection:
-```bash
-curl http://localhost:5230/test
-```
-
-Invoke the list_books tool:
-```bash
-curl -X POST http://localhost:5230/invoke/list_books \
-  -H "Content-Type: application/json" \
-  -d '{"offset": 0, "count": 10}'
-```
-
-Search for books:
-```bash
-curl -X POST http://localhost:5230/invoke/search_books \
-  -H "Content-Type: application/json" \
-  -d '{"query": "tutorial", "offset": 0, "count": 10}'
-```
-
-Advanced search example:
-```bash
-curl -X POST http://localhost:5230/invoke/advanced_search \
-  -H "Content-Type: application/json" \
-  -d '{"entityType": "page", "field": "name", "value": "guide", "operatorType": "Like"}'
-```
 
 Check application health:
 ```bash
@@ -205,7 +168,7 @@ curl http://localhost:5230/health
 - [x] MCP tool definitions for all major BookStack entities
 - [x] HTTP endpoints for testing
 - [x] Health checks with BookStack API dependency check
-- [ ] Full MCP protocol transport implementation
+- [x] MCP protocol implementation using official C# SDK
 - [ ] Authentication and authorization
 - [ ] Error handling improvements
 - [ ] Unit tests

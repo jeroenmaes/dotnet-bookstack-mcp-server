@@ -5,6 +5,7 @@ using System.Text.Json;
 
 namespace BookStackMcpServer.Services;
 
+[McpServerToolType]
 public class BookStackMcpTools
 {
     private readonly ApiService _apiService;
@@ -16,7 +17,7 @@ public class BookStackMcpTools
 
     // Books management - simplified version
     [Description("List all books")]
-    [McpServerTool(Name = "list_books")]
+    [McpServerTool]
     public async Task<string> ListBooksAsync(int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -25,7 +26,7 @@ public class BookStackMcpTools
     }
     
     [Description("Get book details by ID")]
-    [McpServerTool(Name = "get_book")]
+    [McpServerTool]
     public async Task<string> GetBookAsync(int id)
     {
         var book = await _apiService.GetDetailsAsync<BookDetails>(id);
@@ -33,7 +34,7 @@ public class BookStackMcpTools
     }
     
     [Description("Create a new book")]
-    [McpServerTool(Name = "create_book")]
+    [McpServerTool]
     public async Task<string> CreateBookAsync(string name, string? description = null)
     {
         var book = new Book
@@ -47,7 +48,7 @@ public class BookStackMcpTools
     }
     
     [Description("Delete a book")]
-    [McpServerTool(Name = "delete_book")]
+    [McpServerTool]
     public async Task<string> DeleteBookAsync(int id)
     {
         var result = await _apiService.DeleteAsync<Book>(id);
@@ -56,7 +57,7 @@ public class BookStackMcpTools
 
     // Chapters management - simplified version
     [Description("List all chapters")]
-    [McpServerTool(Name = "list_chapters")]
+    [McpServerTool]
     public async Task<string> ListChaptersAsync(int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -65,7 +66,7 @@ public class BookStackMcpTools
     }
     
     [Description("Get chapter details by ID")]
-    [McpServerTool(Name = "get_chapter")]
+    [McpServerTool]
     public async Task<string> GetChapterAsync(int id)
     {
         var chapter = await _apiService.GetDetailsAsync<ChapterDetails>(id);
@@ -73,7 +74,7 @@ public class BookStackMcpTools
     }
     
     [Description("Create a new chapter")]
-    [McpServerTool(Name = "create_chapter")]
+    [McpServerTool]
     public async Task<string> CreateChapterAsync(string name, int bookId, string? description = null, int priority = 0)
     {
         var chapter = new Chapter
@@ -89,7 +90,7 @@ public class BookStackMcpTools
     }
     
     [Description("Delete a chapter")]
-    [McpServerTool(Name = "delete_chapter")]
+    [McpServerTool]
     public async Task<string> DeleteChapterAsync(int id)
     {
         var result = await _apiService.DeleteAsync<Chapter>(id);
@@ -98,7 +99,7 @@ public class BookStackMcpTools
 
     // Pages management - simplified version
     [Description("List all pages")]
-    [McpServerTool(Name = "list_pages")]
+    [McpServerTool]
     public async Task<string> ListPagesAsync(int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -107,7 +108,7 @@ public class BookStackMcpTools
     }
     
     [Description("Get page details by ID")]
-    [McpServerTool(Name = "get_page")]
+    [McpServerTool]
     public async Task<string> GetPageAsync(int id)
     {
         var page = await _apiService.GetDetailsAsync<PageDetails>(id);
@@ -115,7 +116,7 @@ public class BookStackMcpTools
     }
     
     [Description("Create a new page")]
-    [McpServerTool(Name = "create_page")]
+    [McpServerTool]
     public async Task<string> CreatePageAsync(string name, string content, int? bookId = null, int? chapterId = null)
     {
         var page = new Page
@@ -130,7 +131,7 @@ public class BookStackMcpTools
     }
     
     [Description("Delete a page")]
-    [McpServerTool(Name = "delete_page")]
+    [McpServerTool]
     public async Task<string> DeletePageAsync(int id)
     {
         var result = await _apiService.DeleteAsync<Page>(id);
@@ -139,7 +140,7 @@ public class BookStackMcpTools
 
     // Shelves management - simplified version
     [Description("List all shelves")]
-    [McpServerTool(Name = "list_shelves")]
+    [McpServerTool]
     public async Task<string> ListShelvesAsync(int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -148,7 +149,7 @@ public class BookStackMcpTools
     }
     
     [Description("Get shelf details by ID")]
-    [McpServerTool(Name = "get_shelf")]
+    [McpServerTool]
     public async Task<string> GetShelfAsync(int id)
     {
         var shelf = await _apiService.GetDetailsAsync<ShelfDetails>(id);
@@ -156,7 +157,7 @@ public class BookStackMcpTools
     }
     
     [Description("Create a new shelf")]
-    [McpServerTool(Name = "create_shelf")]
+    [McpServerTool]
     public async Task<string> CreateShelfAsync(string name, string? description = null)
     {
         var shelf = new Shelf
@@ -170,7 +171,7 @@ public class BookStackMcpTools
     }
     
     [Description("Delete a shelf")]
-    [McpServerTool(Name = "delete_shelf")]
+    [McpServerTool]
     public async Task<string> DeleteShelfAsync(int id)
     {
         var result = await _apiService.DeleteAsync<Shelf>(id);
@@ -179,7 +180,7 @@ public class BookStackMcpTools
 
     // Users management - simplified version
     [Description("List all users")]
-    [McpServerTool(Name = "list_users")]
+    [McpServerTool]
     public async Task<string> ListUsersAsync(int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -188,7 +189,7 @@ public class BookStackMcpTools
     }
     
     [Description("Get user details by ID")]
-    [McpServerTool(Name = "get_user")]
+    [McpServerTool]
     public async Task<string> GetUserAsync(int id)
     {
         var user = await _apiService.GetDetailsAsync<User>(id);
@@ -197,7 +198,7 @@ public class BookStackMcpTools
 
     // Search functionality
     [Description("Search across all BookStack content (books, chapters, pages)")]
-    [McpServerTool(Name = "search_all")]
+    [McpServerTool]
     public async Task<string> SearchAllAsync(string query, int offset = 0, int count = 50)
     {
         var results = new
@@ -212,7 +213,7 @@ public class BookStackMcpTools
     }
 
     [Description("Search for books by name or description")]
-    [McpServerTool(Name = "search_books")]
+    [McpServerTool]
     public async Task<string> SearchBooksAsync(string query, int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -232,7 +233,7 @@ public class BookStackMcpTools
     }
 
     [Description("Search for chapters by name or description")]
-    [McpServerTool(Name = "search_chapters")]
+    [McpServerTool]
     public async Task<string> SearchChaptersAsync(string query, int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -250,7 +251,7 @@ public class BookStackMcpTools
     }
 
     [Description("Search for pages by name or content")]
-    [McpServerTool(Name = "search_pages")]
+    [McpServerTool]
     public async Task<string> SearchPagesAsync(string query, int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -268,7 +269,7 @@ public class BookStackMcpTools
     }
 
     [Description("Search for shelves by name or description")]
-    [McpServerTool(Name = "search_shelves")]
+    [McpServerTool]
     public async Task<string> SearchShelvesAsync(string query, int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -286,7 +287,7 @@ public class BookStackMcpTools
     }
 
     [Description("Search for users by name or email")]
-    [McpServerTool(Name = "search_users")]
+    [McpServerTool]
     public async Task<string> SearchUsersAsync(string query, int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
@@ -304,7 +305,7 @@ public class BookStackMcpTools
     }
 
     [Description("Advanced search with custom filters")]
-    [McpServerTool(Name = "advanced_search")]
+    [McpServerTool]
     public async Task<string> AdvancedSearchAsync(string entityType, string field, string value, string operatorType = "like", int offset = 0, int count = 50)
     {
         var parameters = new ListParameters { Offset = offset, Count = count };
