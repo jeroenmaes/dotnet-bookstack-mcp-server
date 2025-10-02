@@ -132,6 +132,14 @@ While the full MCP protocol implementation is in progress, the server provides H
 - `GET /test` - Test BookStack API connectivity
 - `POST /invoke/{toolName}` - Invoke a specific tool with parameters
 
+### Health Check Endpoints
+
+The server provides ASP.NET Core health check endpoints for monitoring:
+
+- `GET /health` - Comprehensive health check with detailed status information
+- `GET /health/ready` - Readiness check (includes BookStack API dependency check)
+- `GET /health/live` - Liveness check (returns 200 if the application is running)
+
 ### Example Usage
 
 List available tools:
@@ -165,6 +173,18 @@ curl -X POST http://localhost:5230/invoke/advanced_search \
   -d '{"entityType": "page", "field": "name", "value": "guide", "operatorType": "Like"}'
 ```
 
+Check application health:
+```bash
+# Liveness check (app is running)
+curl http://localhost:5230/health/live
+
+# Readiness check (app is ready to serve requests, including BookStack API)
+curl http://localhost:5230/health/ready
+
+# Detailed health information
+curl http://localhost:5230/health
+```
+
 ## BookStack API Setup
 
 1. In your BookStack instance, go to Settings → Users → API Tokens
@@ -176,6 +196,7 @@ curl -X POST http://localhost:5230/invoke/advanced_search \
 - **ASP.NET Core 8** - Web framework
 - **ModelContextProtocol.AspNetCore** (0.4.0-preview.1) - MCP server implementation
 - **BookStackApi** (1.3.0) - BookStack API client library
+- **Microsoft.Extensions.Diagnostics.HealthChecks** (9.0.9) - Health checks support
 
 ## Development Status
 
@@ -183,6 +204,7 @@ curl -X POST http://localhost:5230/invoke/advanced_search \
 - [x] BookStack API integration
 - [x] MCP tool definitions for all major BookStack entities
 - [x] HTTP endpoints for testing
+- [x] Health checks with BookStack API dependency check
 - [ ] Full MCP protocol transport implementation
 - [ ] Authentication and authorization
 - [ ] Error handling improvements
