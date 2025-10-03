@@ -44,9 +44,16 @@ builder.Services.AddSingleton<BookStackClient>(serviceProvider =>
 });
 
 // Add MCP Server with HTTP transport and BookStack tools
-builder.Services.AddMcpServer()
+var bookStackOptionsForTools = builder.Configuration.GetSection(BookStackOptions.SectionName).Get<BookStackOptions>();
+var mcpServerBuilder = builder.Services.AddMcpServer()
     .WithHttpTransport()
     .WithTools<BookStackMcpTools>();
+
+// Conditionally add write tools if enabled
+if (bookStackOptionsForTools?.EnableWrite == true)
+{
+    mcpServerBuilder.WithTools<BookStackMcpWriteTools>();
+}
 
 // Add health checks
 builder.Services.AddHealthChecks()
@@ -103,6 +110,15 @@ if (!string.IsNullOrEmpty(securityOptions?.AuthHeaderName))
 else
 {
     logger.LogInformation("Security not configured - all requests allowed");
+}
+
+if (bookStackOptions?.EnableWrite == true)
+{
+    logger.LogInformation("Write mode enabled - Create/Delete operations available");
+}
+else
+{
+    logger.LogInformation("Read-only mode - Create/Delete operations disabled");
 }
 
 // Add global exception handling middleware

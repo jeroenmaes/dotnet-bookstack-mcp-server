@@ -6,29 +6,31 @@ An ASP.NET Core 9 Model Context Protocol (MCP) server that provides tools for in
 
 This MCP server implements tools for all major BookStack API endpoints:
 
+**Note:** Write operations (create/delete) are disabled by default. Set `BookStack:EnableWrite` to `true` to enable them.
+
 ### Books Management
 - `list_books` - List all books with pagination
 - `get_book` - Get detailed information about a specific book
-- `create_book` - Create a new book
-- `delete_book` - Delete a book
+- `create_book` - Create a new book (requires `EnableWrite: true`)
+- `delete_book` - Delete a book (requires `EnableWrite: true`)
 
 ### Chapters Management  
 - `list_chapters` - List all chapters with pagination
 - `get_chapter` - Get detailed information about a specific chapter
-- `create_chapter` - Create a new chapter in a book
-- `delete_chapter` - Delete a chapter
+- `create_chapter` - Create a new chapter in a book (requires `EnableWrite: true`)
+- `delete_chapter` - Delete a chapter (requires `EnableWrite: true`)
 
 ### Pages Management
 - `list_pages` - List all pages with pagination
 - `get_page` - Get detailed information about a specific page
-- `create_page` - Create a new page in a book or chapter
-- `delete_page` - Delete a page
+- `create_page` - Create a new page in a book or chapter (requires `EnableWrite: true`)
+- `delete_page` - Delete a page (requires `EnableWrite: true`)
 
 ### Shelves Management
 - `list_shelves` - List all shelves with pagination
 - `get_shelf` - Get detailed information about a specific shelf
-- `create_shelf` - Create a new shelf
-- `delete_shelf` - Delete a shelf
+- `create_shelf` - Create a new shelf (requires `EnableWrite: true`)
+- `delete_shelf` - Delete a shelf (requires `EnableWrite: true`)
 
 ### Users Management
 - `list_users` - List all users with pagination
@@ -134,6 +136,46 @@ docker pull ghcr.io/jeroenmaes/dotnet-bookstack-mcp-server:v1.0.0
 ## MCP Protocol
 
 The server implements the Model Context Protocol using the official C# SDK. It exposes an MCP endpoint that can be used by MCP-compatible clients to interact with BookStack.
+
+### Read-Only Mode (Default)
+
+By default, the server operates in read-only mode for safety. Write operations (`create_*` and `delete_*` tools) are disabled unless explicitly enabled.
+
+**To enable write operations:**
+
+In `appsettings.json`:
+```json
+{
+  "BookStack": {
+    "BaseUrl": "https://your-bookstack-instance.com",
+    "TokenId": "your-token-id",
+    "TokenSecret": "your-token-secret",
+    "EnableWrite": true
+  }
+}
+```
+
+Or via environment variables:
+```bash
+BookStack__EnableWrite=true
+```
+
+**Docker example with write enabled:**
+```bash
+docker run -d \
+  -p 8080:8080 \
+  -e BookStack__BaseUrl=https://your-bookstack-instance.com \
+  -e BookStack__TokenId=your-token-id \
+  -e BookStack__TokenSecret=your-token-secret \
+  -e BookStack__EnableWrite=true \
+  --name bookstack-mcp-server \
+  bookstack-mcp-server
+```
+
+**Notes:**
+- When `EnableWrite` is `false` (default), only read operations (list, get, search) are available
+- When `EnableWrite` is `true`, create and delete operations become available
+- This provides an extra layer of protection against accidental modifications to your BookStack content
 
 ### Optional Security
 
