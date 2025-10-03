@@ -21,7 +21,7 @@ public class BookStackMcpTools
     // Books management - simplified version
     [Description("List all books")]
     [McpServerTool]
-    public async Task<string> ListBooksAsync(int offset = 0, int count = 50)
+    public async Task<string> ListBooksAsync(int offset = 0, int count = 500)
     {
         try
         {
@@ -58,7 +58,7 @@ public class BookStackMcpTools
     // Chapters management - simplified version
     [Description("List all chapters")]
     [McpServerTool]
-    public async Task<string> ListChaptersAsync(int offset = 0, int count = 50)
+    public async Task<string> ListChaptersAsync(int offset = 0, int count = 500)
     {
         try
         {
@@ -95,7 +95,7 @@ public class BookStackMcpTools
     // Pages management - simplified version
     [Description("List all pages")]
     [McpServerTool]
-    public async Task<string> ListPagesAsync(int offset = 0, int count = 50)
+    public async Task<string> ListPagesAsync(int offset = 0, int count = 500)
     {
         try
         {
@@ -132,7 +132,7 @@ public class BookStackMcpTools
     // Shelves management - simplified version
     [Description("List all shelves")]
     [McpServerTool]
-    public async Task<string> ListShelvesAsync(int offset = 0, int count = 50)
+    public async Task<string> ListShelvesAsync(int offset = 0, int count = 500)
     {
         try
         {
@@ -169,7 +169,7 @@ public class BookStackMcpTools
     // Users management - simplified version
     [Description("List all users")]
     [McpServerTool]
-    public async Task<string> ListUsersAsync(int offset = 0, int count = 50)
+    public async Task<string> ListUsersAsync(int offset = 0, int count = 500)
     {
         try
         {
@@ -206,7 +206,7 @@ public class BookStackMcpTools
     // Search functionality
     [Description("Search across all BookStack content (books, chapters, pages)")]
     [McpServerTool]
-    public async Task<string> SearchAllAsync(string query, int offset = 0, int count = 50)
+    public async Task<string> SearchAllAsync(string query, int offset = 0, int count = 500)
     {
         try
         {
@@ -237,7 +237,7 @@ public class BookStackMcpTools
 
     [Description("Search for books by name or description")]
     [McpServerTool]
-    public async Task<string> SearchBooksAsync(string query, int offset = 0, int count = 50)
+    public async Task<string> SearchBooksAsync(string query, int offset = 0, int count = 500)
     {
         try
         {
@@ -265,7 +265,7 @@ public class BookStackMcpTools
 
     [Description("Search for chapters by name or description")]
     [McpServerTool]
-    public async Task<string> SearchChaptersAsync(string query, int offset = 0, int count = 50)
+    public async Task<string> SearchChaptersAsync(string query, int offset = 0, int count = 500)
     {
         try
         {
@@ -293,7 +293,7 @@ public class BookStackMcpTools
 
     [Description("Search for pages by name or content")]
     [McpServerTool]
-    public async Task<string> SearchPagesAsync(string query, int offset = 0, int count = 50)
+    public async Task<string> SearchPagesAsync(string query, int offset = 0, int count = 500)
     {
         try
         {
@@ -321,7 +321,7 @@ public class BookStackMcpTools
 
     [Description("Search for shelves by name or description")]
     [McpServerTool]
-    public async Task<string> SearchShelvesAsync(string query, int offset = 0, int count = 50)
+    public async Task<string> SearchShelvesAsync(string query, int offset = 0, int count = 500)
     {
         try
         {
@@ -349,7 +349,7 @@ public class BookStackMcpTools
 
     [Description("Search for users by name or email")]
     [McpServerTool]
-    public async Task<string> SearchUsersAsync(string query, int offset = 0, int count = 50)
+    public async Task<string> SearchUsersAsync(string query, int offset = 0, int count = 500)
     {
         try
         {
@@ -369,7 +369,7 @@ public class BookStackMcpTools
 
     [Description("Advanced search with custom filters")]
     [McpServerTool]
-    public async Task<string> AdvancedSearchAsync(string entityType, string field, string value, string operatorType = "like", int offset = 0, int count = 50)
+    public async Task<string> AdvancedSearchAsync(string entityType, string field, string value, string operatorType = "like", int offset = 0, int count = 500)
     {
         try
         {
