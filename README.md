@@ -271,7 +271,7 @@ curl http://localhost:8080/health
 - [x] Optional authentication with HTTP headers
 - [x] HTTP throttling/rate limiting
 - [x] Unit tests
-- [ ] Error handling improvements
+- [x] Error handling improvements
 
 ## License
 
