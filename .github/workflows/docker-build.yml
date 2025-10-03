@@ -33,13 +33,16 @@ jobs:
     - name: Build
       run: dotnet build BookStackMcpServer/BookStackMcpServer.csproj --no-restore --configuration Release
 
-    - name: Test (if tests exist)
-      run: |
-        if [ -d "BookStackMcpServer.Tests" ] || grep -q "Microsoft.NET.Test.Sdk" BookStackMcpServer/BookStackMcpServer.csproj; then
-          dotnet test BookStackMcpServer/BookStackMcpServer.csproj --no-build --configuration Release --verbosity normal
-        else
-          echo "No tests found, skipping test step"
-        fi
+    - name: Test
+      run: dotnet test BookStackMcpServer.Tests/BookStackMcpServer.Tests.csproj --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+    - name: Publish Test Results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/test-results.trx'
+        retention-days: 30
 
     - name: Log in to Container Registry
       if: github.event_name != 'pull_request'

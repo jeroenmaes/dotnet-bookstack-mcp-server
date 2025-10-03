@@ -10,10 +10,12 @@ namespace BookStackMcpServer.Tests.HealthChecks;
 public class BookStackHealthCheckTests
 {
     private readonly Mock<ILogger<BookStackHealthCheck>> _loggerMock;
+    private readonly Mock<IHttpClientFactory> _httpClientFactoryMock;
 
     public BookStackHealthCheckTests()
     {
         _loggerMock = new Mock<ILogger<BookStackHealthCheck>>();
+        _httpClientFactoryMock = new Mock<IHttpClientFactory>();
     }
 
     [Fact]
@@ -28,7 +30,7 @@ public class BookStackHealthCheckTests
         });
 
         // Act
-        var healthCheck = new BookStackHealthCheck(options, _loggerMock.Object);
+        var healthCheck = new BookStackHealthCheck(options, _loggerMock.Object, _httpClientFactoryMock.Object);
 
         // Assert - if constructor doesn't throw, trimming is working
         Assert.NotNull(healthCheck);
@@ -46,7 +48,7 @@ public class BookStackHealthCheckTests
         });
 
         // Act
-        var healthCheck = new BookStackHealthCheck(options, _loggerMock.Object);
+        var healthCheck = new BookStackHealthCheck(options, _loggerMock.Object, _httpClientFactoryMock.Object);
 
         // Assert
         Assert.NotNull(healthCheck);
