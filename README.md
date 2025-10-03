@@ -302,19 +302,6 @@ curl http://localhost:8080/health
 - **BookStackApiClient** (25.7.0-lib.2) - BookStack API client library
 - **Microsoft.Extensions.Diagnostics.HealthChecks** (9.0.9) - Health checks support
 
-## Development Status
-
-- [x] ASP.NET Core 9 project structure
-- [x] BookStack API integration
-- [x] MCP tool definitions for all major BookStack entities
-- [x] HTTP endpoints for testing
-- [x] Health checks with BookStack API dependency check
-- [x] MCP protocol implementation using official C# SDK
-- [x] Optional authentication with HTTP headers
-- [x] HTTP throttling/rate limiting
-- [x] Unit tests
-- [x] Error handling improvements
-
 ## License
 
 MIT License - see LICENSE file for details.
