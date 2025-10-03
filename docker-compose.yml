@@ -12,6 +12,7 @@ services:
       - BookStack__BaseUrl=${BOOKSTACK_BASE_URL}
       - BookStack__TokenId=${BOOKSTACK_TOKEN_ID}
       - BookStack__TokenSecret=${BOOKSTACK_TOKEN_SECRET}
+      - BookStack__EnableWrite=${BOOKSTACK_ENABLE_WRITE:-false}
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/tools || exit 1"]

@@ -39,4 +39,30 @@ public class BookStackOptionsTests
         Assert.Equal(string.Empty, options.TokenId);
         Assert.Equal(string.Empty, options.TokenSecret);
     }
+
+    [Fact]
+    public void EnableWrite_DefaultsToFalse()
+    {
+        // Arrange
+        var options = new BookStackOptions();
+
+        // Assert
+        Assert.False(options.EnableWrite);
+    }
+
+    [Fact]
+    public void EnableWrite_CanBeSetToTrue()
+    {
+        // Arrange
+        var options = new BookStackOptions
+        {
+            BaseUrl = "https://example.com",
+            TokenId = "test-token-id",
+            TokenSecret = "test-token-secret",
+            EnableWrite = true
+        };
+
+        // Assert
+        Assert.True(options.EnableWrite);
+    }
 }
